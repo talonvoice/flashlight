@@ -228,12 +228,15 @@ set(
   Autograd
   Common
   Dataset
-  Distributed
   Memory
   Meter
   NN
   Optim
   )
+
+if (FL_BUILD_DISTRIBUTED)
+  set(FLASHLIGHT_MODULES ${FLASHLIGHT_MODULES} Distributed)
+endif()
 
 # Build and link resources from `flashlight/contrib`.
 set(FL_BUILD_CONTRIB ON CACHE BOOL
@@ -284,8 +287,10 @@ include(${FLASHLIGHT_PROJECT_COMPONENT_SRC_DIR}/common/CMakeLists.txt)
 # Dataset
 include(${FLASHLIGHT_PROJECT_COMPONENT_SRC_DIR}/dataset/CMakeLists.txt)
 
-# Dataset
-include(${FLASHLIGHT_PROJECT_COMPONENT_SRC_DIR}/distributed/CMakeLists.txt)
+# Distributed
+if (FL_BUILD_DISTRIBUTED)
+  include(${FLASHLIGHT_PROJECT_COMPONENT_SRC_DIR}/distributed/CMakeLists.txt)
+endif()
 
 # Memory
 include(${FLASHLIGHT_PROJECT_COMPONENT_SRC_DIR}/memory/CMakeLists.txt)
