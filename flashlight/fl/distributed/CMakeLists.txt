@@ -57,7 +57,7 @@ if (MPI_C_FOUND AND MPI_CXX_FOUND)
   set(MPI_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH} ${MPI_INCLUDE_PATH})
 else()
   message(STATUS "MPI not found")
-  if (FL_BUILD_DISTRIBUTED)
+  if (FL_BUILD_DISTRIBUTED AND NOT FL_DISTRIBUTED_STUB)
     message(FATAL_ERROR "MPI_C and MPI_CXX not found; required to build flashlight distributed")
   endif()
 endif()
@@ -128,4 +128,14 @@ if (USE_GLOO)
     PRIVATE
     gloo
     )
+endif ()
+
+# Distributed
+if (FL_DISTRIBUTED_STUB)
+  target_sources(
+    flashlight
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/backend/stub/DistributedBackend.cpp
+    )
+  message(STATUS "using distributed stub")
 endif ()
