@@ -10,14 +10,18 @@
 #include <cstddef>
 #include <stdexcept>
 
+#if FL_LIBRARIES_USE_ACCELERATE
+#include <Accelerate/Accelerate.h>
+#elif FL_LIBRARIES_USE_MKL
 extern "C" {
-#if FL_LIBRARIES_USE_MKL
 #include <mkl_cblas.h>
 #include <mkl_service.h>
-#else
-#include <cblas.h>
-#endif
 }
+#else
+extern "C" {
+#include <cblas.h>
+}
+#endif
 
 namespace fl {
 namespace lib {

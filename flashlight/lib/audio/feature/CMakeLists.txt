@@ -2,24 +2,28 @@ cmake_minimum_required(VERSION 3.10)
 
 # ----------------------------- Dependencies -----------------------------
 # CBLAS
-if (FL_LIBRARIES_USE_MKL)
-  find_package(MKL REQUIRED)
-  set(CBLAS_LIBRARIES ${MKL_LIBRARIES})
-  set(CBLAS_INCLUDE_DIR ${MKL_INCLUDE_DIR})
-  setup_install_find_module(${CMAKE_MODULE_PATH}/FindMKL.cmake)
-else ()
-  find_package(CBLAS REQUIRED)
-  setup_install_find_module(${CMAKE_MODULE_PATH}/FindCBLAS.cmake)
-endif ()
-message(STATUS "CBLAS found (include: ${CBLAS_INCLUDE_DIR}, library: ${CBLAS_LIBRARIES})")
-
-# FFTW
-find_package(FFTW3 REQUIRED)
-if (FFTW3_FOUND)
-  message(STATUS "FFTW found")
-  setup_install_find_module(${CMAKE_MODULE_PATH}/FindFFTW3.cmake)
+if (FL_LIBRARIES_USE_ACCELERATE)
+  set(CBLAS_LIBRARIES "-framework Accelerate")
+  set(CBLAS_INCLUDE_DIR "")
+  set(FFT_LIBRARIES "")
+  add_definitions(-DFL_LIBRARIES_USE_ACCELERATE)
 else()
-  message(FATAL_ERROR "FFTW not found")
+  if (FL_LIBRARIES_USE_MKL)
+    find_package(MKL REQUIRED)
+    set(CBLAS_LIBRARIES ${MKL_LIBRARIES})
+    set(CBLAS_INCLUDE_DIR ${MKL_INCLUDE_DIR})
+    setup_install_find_module(${CMAKE_MODULE_PATH}/FindMKL.cmake)
+  else ()
+    find_package(CBLAS REQUIRED)
+    setup_install_find_module(${CMAKE_MODULE_PATH}/FindCBLAS.cmake)
+  endif ()
+  message(STATUS "CBLAS found (include: ${CBLAS_INCLUDE_DIR}, library: ${CBLAS_LIBRARIES})")
+
+  find_library(LIBIPPS NAMES libipps.a HINTS /opt/intel/ipp/lib)
+  find_library(LIBIPPVM NAMES libippvm.a HINTS /opt/intel/ipp/lib)
+  find_library(LIBIPPCORE NAMES libippcore.a HINTS /opt/intel/ipp/lib)
+  set(FFT_LIBRARIES ${LIBIPPS} ${LIBIPPCORE} ${LIBIPPVM})
+  add_definitions(-DFL_LIBRARIES_USE_IPP)
 endif()
 
 # OpenMP
@@ -56,11 +60,10 @@ endif()
 
 target_link_libraries(
   fl-libraries
-  PUBLIC
-    $<BUILD_INTERFACE:FFTW3::fftw3>
   PRIVATE
     ${OMPLIB}
     ${CBLAS_LIBRARIES}
+    ${FFT_LIBRARIES}
   )
 
 target_include_directories(

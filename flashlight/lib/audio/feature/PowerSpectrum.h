@@ -10,14 +10,18 @@
 #include <memory>
 #include <mutex>
 
+#if FL_LIBRARIES_USE_ACCELERATE
+#include <Accelerate/Accelerate.h>
+#elif FL_LIBRARIES_USE_IPP
+#include <ipp.h>
+#else
+#error "No FFT library selected"
+#endif
+
 #include "flashlight/lib/audio/feature/Dither.h"
 #include "flashlight/lib/audio/feature/FeatureParams.h"
 #include "flashlight/lib/audio/feature/PreEmphasis.h"
 #include "flashlight/lib/audio/feature/Windowing.h"
-
-// Fwd decl
-class fftw_plan_s;
-typedef fftw_plan_s* fftw_plan;
 
 namespace fl {
 namespace lib {
@@ -58,9 +62,18 @@ class PowerSpectrum {
   PreEmphasis preEmphasis_;
   Windowing windowing_;
 
-  std::unique_ptr<fftw_plan> fftPlan_; // fftw_plan is an opque pointer type
-  std::vector<double> inFftBuf_, outFftBuf_;
+  std::vector<float> inFftBuf_, outFftBuf_;
   std::mutex fftMutex_;
+#if FL_LIBRARIES_USE_ACCELERATE
+  vDSP_DFT_Setup fftSetup_;
+  DSPSplitComplex splitData_;
+#elif FL_LIBRARIES_USE_IPP
+  Ipp8u *memBuffer_;
+  Ipp8u *memSpec_;
+  IppsFFTSpec_R_32f *fftSpec_;
+  Ipp32f *outPerm_;
+  Ipp32fc *outComplex_;
+#endif
 };
 } // namespace audio
 } // namespace lib
