@@ -153,6 +153,7 @@ if (FL_BUILD_CORE)
   # ------------------------ Global External Dependencies ------------------------
   # ArrayFire
   find_package(ArrayFire REQUIRED)
+  set_target_properties(ArrayFire::afcpu PROPERTIES INTERFACE_LINK_LIBRARIES "")
   if (ArrayFire_FOUND AND ArrayFire_VERSION VERSION_LESS 3.7.1)
     message(FATAL_ERROR "ArrayFire versions < 3.7.1 are no longer supported "
       "with flashlight. To build flashlight with a version of ArrayFire "
