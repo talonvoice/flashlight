@@ -8,6 +8,7 @@
 #include "flashlight/fl/dataset/Utils.h"
 
 #include <algorithm>
+#include <array>
 #include <stdexcept>
 
 namespace fl {

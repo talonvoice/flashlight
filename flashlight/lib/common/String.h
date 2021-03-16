@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <errno.h>
 #include <stdexcept>
 #include <string>
 #include <type_traits>

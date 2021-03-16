@@ -41,8 +41,7 @@ bool allClose(
 }
 
 std::string dateTimeWithMicroSeconds() {
-  std::chrono::system_clock::time_point highResTime =
-      std::chrono::high_resolution_clock::now();
+  const auto highResTime = std::chrono::system_clock::now();
   const time_t secondsSinceEpoc =
       std::chrono::system_clock::to_time_t(highResTime);
   const struct tm* timeinfo = localtime(&secondsSinceEpoc);

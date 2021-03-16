@@ -60,7 +60,7 @@ DnnlEngine& DnnlEngine::getInstance() {
 
 dnnl::memory::dims convertAfToDnnlDims(const std::vector<dim_t>& afDims) {
   // DNNL uses ints in dims
-  std::vector<long int> intVec(afDims.begin(), afDims.end());
+  std::vector<long long> intVec(afDims.begin(), afDims.end());
   return dnnl::memory::dims(intVec);
 }
 
